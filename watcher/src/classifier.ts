@@ -52,7 +52,14 @@ const RULES: { type: TicketType; keywords: string[] }[] = [
   },
   {
     type: "make-order-failed",
-    keywords: ["lỗi tạo đơn", "make order failed", "không tạo được order"]
+    keywords: [
+      "lỗi tạo đơn",
+      "make order failed",
+      "không tạo được order",
+      "không tạo order được",
+      "Customer not found",
+      "Không tìm thấy khách hàng"
+    ]
   },
   {
     type: "not-enroll",

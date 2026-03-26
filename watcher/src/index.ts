@@ -148,9 +148,9 @@ async function processEmail(messageId: string, subject: string): Promise<void> {
     // case "no-payment-date":
     //   result = await handleNoPaymentDate(ctx);
     //   break;
-    // case "make-order-failed":
-    //   result = await handleMakeOrderFailed(ctx);
-    //   break;
+    case "make-order-failed":
+      result = await handleMakeOrderFailed(ctx);
+      break;
     default:
       result = "unknown — skipped";
   }

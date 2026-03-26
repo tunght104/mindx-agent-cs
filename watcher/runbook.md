@@ -15,7 +15,7 @@ Read the ticket content from the Odoo system and classify it into **exactly one*
 | `not-resale-upsale` | Không thể resale/upsale, lead chưa hoàn thành học phí nên nhờ team giúp tạo upsale, resale. không hiện resale, upsale. | "không tạo được order" không liên quan gì đến resale, upsale|
 | `tick-uncompleted` | Tick chưa hoàn thành, trạng thái incomplete, chưa complete | |
 | `no-payment-date` | ngày chi trả, ngày add payment, không add payment đúng ngày | Nếu chỉ có add payment mà không có ngày chi trả thì không phải là no-payment-date |
-| `make-order-failed` | lỗi tạo đơn, make order failed, không tạo được order | Nếu không đề cập đến việc không tạo được order thì không phải là make-order-failed|
+| `make-order-failed` | make order failed, không tạo được order, Customer not found | Nếu không đề cập đến việc không tạo được order thì không phải là make-order-failed|
 | `unknown` | Không xác định được — chỉ dùng khi thật sự không khớp loại nào |
 
 ## Rules

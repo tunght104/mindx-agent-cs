@@ -12,7 +12,12 @@ export const register = (program: Command, client: Client) => {
     .action(async (options) => {
       const numerical: number = options.numerical;
       try {
-        const { subject, body: htmlBody } = await fetchMailBody(client, numerical, options.search);
+        const result = await fetchMailBody(client, numerical, options.search);
+        if (!result) {
+          console.log("Not a verified email address.");
+          process.exit(0);
+        }
+        const { subject, body: htmlBody } = result;
         console.log(`Subject: ${subject}`);
 
         const link = extractFirstLink(htmlBody);

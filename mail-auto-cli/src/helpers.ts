@@ -8,6 +8,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const PAGE_SIZE = 10;
 
+export const ALLOWED_SENDERS = [
+  "techteam@mindxhrm.odoo.com",
+  "thuypt@mindx.com.vn"
+];
+
 // ── Shared Types ─────────────────────────────────────────────────────────────
 
 export type MailAddress = {
@@ -64,10 +69,10 @@ export const fetchMailBody = async (
   client: Client,
   numerical?: number,
   keyword?: string
-): Promise<MailBody> => {
+): Promise<MailBody | null> => {
   let request = client
     .api("/me/mailFolders/inbox/messages")
-    .select("id,subject,body");
+    .select("id,subject,body,from");
 
   if (keyword) {
     // Search mode: find first matching email by keyword
@@ -79,7 +84,7 @@ export const fetchMailBody = async (
     throw new Error("Must provide [numerical] or --search <keyword>.");
   }
 
-  type MailBodyRaw = { subject: string | null; body: { content: string } | null };
+  type MailBodyRaw = { subject: string | null; body: { content: string } | null; from?: { emailAddress?: { name?: string; address?: string } } };
   const response = await request.get() as { value?: MailBodyRaw[] };
   const mail = response?.value?.[0];
   if (!mail) throw new Error(
@@ -87,6 +92,15 @@ export const fetchMailBody = async (
       ? `No email found matching keyword: "${keyword}"`
       : `No email found at position ${numerical}.`
   );
+
+  const senderName = mail.from?.emailAddress?.name ?? "";
+  const senderEmail = mail.from?.emailAddress?.address ?? "";
+
+  // Check if sender is allowed
+  if (!ALLOWED_SENDERS.includes(senderName) && !ALLOWED_SENDERS.includes(senderEmail)) {
+    return null;
+  }
+
   return { subject: mail.subject ?? "", body: mail.body?.content ?? "" };
 };
 
