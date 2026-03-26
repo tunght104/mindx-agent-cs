@@ -28,6 +28,7 @@ import {
   extractOdooLink,
   crawlOdooContent,
   extractLeadId,
+  ALLOWED_SENDERS,
 } from "./mail-client.js";
 import { classifyWithAI, writeClassifiedTicket, writeCompletedTicket, cleanupClassifiedTicket } from "./ai-classifier.js";
 import { handleNotEnroll } from "./handlers/handle-not-enroll.js";
@@ -170,9 +171,9 @@ async function processEmail(messageId: string, subject: string): Promise<void> {
 async function pollOnce(): Promise<void> {
   logger.info(`--- Poll cycle started (pageSize=${POLL_PAGE_SIZE}, dryRun=${DRY_RUN}) ---`);
 
-  let emails: { id: string; subject: string | null }[];
+  let emails: { id: string; subject: string | null; from?: any }[];
   try {
-    emails = await fetchMails(mailClient, { page: 1, pageSize: POLL_PAGE_SIZE, select: "id,subject,receivedDateTime" });
+    emails = await fetchMails(mailClient, { page: 1, pageSize: POLL_PAGE_SIZE, select: "id,subject,receivedDateTime,from" });
   } catch (err) {
     logger.error(`Inbox fetch failed: ${err instanceof Error ? err.message : err}`);
     return;
@@ -184,6 +185,15 @@ async function pollOnce(): Promise<void> {
   for (const email of newEmails) {
     try {
       logger.info(`Email: "${email.subject}" (${email.id})`);
+
+      const senderName = email.from?.emailAddress?.name ?? "";
+      const senderEmail = email.from?.emailAddress?.address ?? "";
+      if (!ALLOWED_SENDERS.includes(senderName) && !ALLOWED_SENDERS.includes(senderEmail)) {
+        logger.info(`  Skipping: Not a verified email address.`);
+        stateManager.markDone(email.id);
+        continue;
+      }
+
       await processEmail(email.id, email.subject ?? "");
     } catch (err) {
       logger.error(`Unhandled error for message Subject=${email.subject}: ${err instanceof Error ? err.message : err}`);
