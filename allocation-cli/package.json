@@ -1,0 +1,24 @@
+{
+  "name": "allocation-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "v2-all": "tsx src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.31.0",
+  "dependencies": {
+    "axios": "^1.13.6",
+    "commander": "^14.0.3",
+    "dotenv": "^17.3.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "mindx-crm",
+  "version": "1.0.0",
+  "description": "MindX CRM automation workspace",
+  "private": true,
+  "packageManager": "pnpm@10.31.0",
+  "scripts": {
+    "mail": "tsx mail-auto-cli/src/index.ts",
+    "allocation": "tsx allocation-cli/src/index.ts",
+    "watcher": "tsx watcher/src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.4.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+!.example.env
+
+# Auth & token records (mail-auto-cli, mcp-server)
+.mail-auto-cli-auth-record.json
+.crm-token-record.json
+.processed-state.json
+
+# Logs & temp
+logs/
+tmp/
+coverage/
+
+# pending
+pending/
+classified/
+completed/
+
+# Lock files (managed by pnpm at root)
+package-lock.json
+
+# OS
+.DS_Store
+
+# rule agent
+.cursor
+.gemini/
+.agent/

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "Node16",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "composite": false
+  },
+  "include": [
+    "src/**/*",
+    "../mail-auto-cli/src/**/*",
+    "../allocation-cli/src/**/*"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "watcher",
+  "version": "1.0.0",
+  "description": "Continuous ticket processing daemon for MindX CRM",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@azure/identity": "^4.13.0",
+    "@azure/identity-cache-persistence": "^1.2.0",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "axios": "^1.13.6",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.4.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,11 @@
+packages:
+  - 'allocation-cli'
+  - 'mail-auto-cli'
+  - 'process-ticket-cli'
+  - 'watcher'
+
+allowBuilds:
+  '@azure/msal-node-extensions': true
+  '@azure/msal-node-runtime': true
+  keytar: true
+  esbuild: true
