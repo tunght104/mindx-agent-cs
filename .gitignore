@@ -34,5 +34,5 @@ package-lock.json
 
 # rule agent
 .cursor
-.gemini/
+.gemini/settings.json
 .agent/
