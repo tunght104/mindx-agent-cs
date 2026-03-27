@@ -40,12 +40,16 @@ import { handleTickUncompleted } from "./handlers/handle-tick-uncompleted.js";
 import { handleNoPaymentDate } from "./handlers/handle-no-payment-date.js";
 import { handleMakeOrderFailed } from "./handlers/handle-make-order-failed.js";
 import { tryReadCrmToken } from "../../allocation-cli/src/lib/allocation.js";
+import { runApproveCli } from "./cli/approve.js";
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
 const POLL_INTERVAL_MS = parseInt(process.env.POLL_INTERVAL_MS ?? "100000", 10); // 100 s
 const POLL_PAGE_SIZE = parseInt(process.env.POLL_PAGE_SIZE ?? "20", 10);
 const DRY_RUN = process.env.DRY_RUN === "true";
+const MANUAL_TYPES = [
+  "no-payment-date"
+];
 
 const mailClient = Client.initWithMiddleware({ authProvider });
 
@@ -116,7 +120,14 @@ async function processEmail(messageId: string, subject: string): Promise<void> {
     // Non-fatal — handlers will handle null leadId gracefully
   }
 
-  // 6. Build context and dispatch handler
+  // 6. Check for Manual Tickets
+  if (MANUAL_TYPES.includes(ticketType)) {
+    logger.info(`  Ticket type ${ticketType} is configured as MANUAL. Saving to classified/ and awaiting approval.`);
+    stateManager.markDone(messageId);
+    return;
+  }
+
+  // 7. Process Auto Tickets: Build context and dispatch handler
   const ctx = {
     messageId,
     odooContent,
@@ -222,7 +233,16 @@ async function main() {
   }, POLL_INTERVAL_MS);
 }
 
-main().catch((err) => {
-  logger.error(`Fatal: ${err instanceof Error ? err.message : err}`);
-  process.exit(1);
-});
+const args = process.argv.slice(2);
+if (args[0] === "approve") {
+  const approveArgs = args.slice(1);
+  runApproveCli(approveArgs).catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+} else {
+  main().catch((err) => {
+    logger.error(`Fatal: ${err instanceof Error ? err.message : err}`);
+    process.exit(1);
+  });
+}

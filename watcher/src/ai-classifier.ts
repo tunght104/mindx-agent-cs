@@ -47,7 +47,7 @@ export function writeClassifiedTicket(messageId: string, subject: string, type: 
   const resultPath = path.join(CLASSIFIED_DIR, `${safeId}.json`);
   fs.writeFileSync(
     resultPath,
-    JSON.stringify({ type, subject, source: "keyword", classifiedAt: new Date().toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }) }, null, 2),
+    JSON.stringify({ messageId, type, subject, source: "keyword", classifiedAt: new Date().toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }) }, null, 2),
     "utf-8",
   );
 }
@@ -81,11 +81,11 @@ export function cleanupClassifiedTicket(messageId: string) {
 /**
  * Move a pending ticket to classified folder after successful AI classification.
  */
-function moveToClassified(pendingPath: string, result: { type: string; reason?: string }) {
+function moveToClassified(pendingPath: string, messageId: string, result: { type: string; reason?: string }) {
   ensureDir(CLASSIFIED_DIR);
   const basename = path.basename(pendingPath, ".md");
   const resultPath = path.join(CLASSIFIED_DIR, `${basename}.json`);
-  fs.writeFileSync(resultPath, JSON.stringify({ ...result, source: "ai", classifiedAt: new Date().toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }) }, null, 2), "utf-8");
+  fs.writeFileSync(resultPath, JSON.stringify({ messageId, ...result, source: "ai", classifiedAt: new Date().toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }) }, null, 2), "utf-8");
 
   // Remove from pending
   try { fs.unlinkSync(pendingPath); } catch { /* ignore */ }
@@ -182,7 +182,7 @@ export async function classifyWithAI(messageId: string, subject: string, odooCon
     }
 
     // 5. Move to classified (success)
-    moveToClassified(pendingPath, { type: parsed.type, reason: parsed.reason });
+    moveToClassified(pendingPath, messageId, { type: parsed.type, reason: parsed.reason });
     return parsed.type as TicketType;
 
   } catch (err) {
