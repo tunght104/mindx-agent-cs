@@ -1,0 +1,9 @@
+{
+  "ALLOWED_SENDERS": [
+    "techteam@mindxhrm.odoo.com",
+    "thuypt@mindx.com.vn"
+  ],
+  "MANUAL_TYPES": [
+    "no-payment-date"
+  ]
+}

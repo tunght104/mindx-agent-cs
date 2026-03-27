@@ -5,8 +5,7 @@
 export {
   fetchMails,
   fetchMailBodyById,
-  extractFirstLink as extractOdooLink,
-  ALLOWED_SENDERS,
+  extractFirstLink as extractOdooLink
 } from "../../mail-auto-cli/src/helpers.js";
 
 export {
