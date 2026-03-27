@@ -1,62 +1,75 @@
-# MindX CRM Watcher Daemon
+# MindX Watcher Daemon & CLI
 
-Watcher is a background daemon process that continuously polls the Outlook inbox to detect, classify, and automatically process incoming support emails (tickets).
+The `watcher` is a background execution service (daemon) and a robust `commander`-based CLI toolkit that polls an Outlook inbox, categorizes arriving tickets, and automatically resolves CRM operations for Customer Success teams.
 
-## Directory Architecture
+## State Management Architecture
 
-The lifecycle of a ticket moves through the following directories:
-- `pending/`: Tickets temporarily stored for AI fallback classification (when keyword classification fails).
-- `classified/`: Tickets that have been successfully assigned a `Type`.
-  - **Auto Tickets** are processed immediately and do not stay in this folder.
-  - **Manual Tickets** are safely kept here waiting for manual approval.
-- `completed/`: Tickets that have been successfully processed and replied to.
+The watcher relies heavily on the local file system for an effective audit trail and crash-resistant queue processing:
+- `pending/`: Temporarily stores ticket text extracts when the system requires an AI Agent CLI fallback for semantic classification.
+- `classified/`: Holds JSON database snapshots. **Manual Tickets** strictly drop into this directory, purposefully halting the automatic mailing script so a human can manually resolve application constraints first.
+- `completed/`: Archives the ticket metadata successfully after the associated automated HTML email reply has been securely dispatched.
 
-## Configuration
+## Installation & Configuration
 
-Copy `.env.example` to `.env` (or reuse the shared `.env` from `mail-auto-cli`).
+Ensure you replicate the `.env` settings located in the project's root or explicitly inside the `watcher/` directory:
 
 ```env
 AZURE_CLIENT_ID_GROUP=...
 AZURE_TENANT_ID_GROUP=...
-POLL_INTERVAL_MS=100000   # Polling interval in milliseconds (default: 100 seconds)
-POLL_PAGE_SIZE=20         # Number of emails to process per batch
-DRY_RUN=false             # Set to true to test logic without actually making Graph API calls
+POLL_INTERVAL_MS=100000   # Internal pause between mail checks (default: 100000ms)
+POLL_PAGE_SIZE=20         # Threshold batch limit for emails processed
+DRY_RUN=false             # Prevent actual API mutations if true
 ```
+
+### Public Configurations
+
+Vital application routing limits exist as publicly version-tracked JSON objects in the repository:
+
+- `.watcher.config.json` (Inside watcher/): Maintains the active array of `MANUAL_TYPES`. Any ticket type assigned to this list immediately instructs the daemon to permanently shelf the incoming ticket in the `classified/` queue.
 
 ---
 
-## Usage & Commands
+## Commands & Execution
 
-Run these scripts from inside the `watcher/` directory:
+The toolkit utilizes a structured `commander` interface. Access help context anytime by appending `--help` to the CLI calls. 
 
-### 1. Start the Polling Daemon
+Run these commands straight from the workspace root:
+
+### 1. Initiate Mail Polling (Daemon)
+
 ```bash
-pnpm dev
-# Or from the project root: pnpm watcher
+pnpm watcher start
 ```
-The daemon will run continuously in the terminal. It automatically replies to Auto Tickets. For Manual Tickets (defined in the `MANUAL_TYPES` array inside `index.ts`), the daemon will stop the email sending process and safely store the ticket JSON file in the `classified/` directory.
 
-### 2. Manual Ticket Approval (Approve CLI)
-Use the `approve` command to review and dispatch emails that are waiting in the `classified/` directory.
-
-**Method 1: Interactive Mode (For Human Operators)**
+Alternatively, you can boot the daemon passing specialized AI Agent CLI integrations:
 ```bash
-pnpm dev approve
-# Or from the project root: pnpm watcher approve
+pnpm watcher start --agent claude
+# The default agent shell string evaluates to "agent"
 ```
-The terminal will display an interactive checklist interface.
-- Use the **Up/Down arrow keys** to navigate.
-- Press **Space** to check the tickets you have already resolved manually on the MindX CRM.
-- Press **Enter** to confirm. The tool will automatically load the templates and SEND the emails.
 
-**Method 2: Batch Approve All (For Scripts / AI Agents)**
-```bash
-pnpm dev approve --all
-```
-This command fetches all pending tickets in the `classified/` directory and sends their emails immediately without any confirmation prompts. This is ideal when instructing an AI assistant to "approve all pending classified tickets".
+The daemon runs continuously in your terminal instance. It executes complicated backend logic hooks for Auto Tickets immediately. For specified target limits like `no-payment-date`, the script holds raw extracts into `classified/` for explicit verification.
 
-**Method 3: Approve Specific Ticket (For Scripts / AI Agents)**
+### 2. Manual Ticket Intercept & Approval
+
+The `manual-processing` utility interacts with halted ticket files remaining in the queue.
+
+**👉 Method 1: Interactive UI (For Human Operators)**
 ```bash
-pnpm dev approve <messageId>
+pnpm watcher manual-processing
 ```
-Targets a precise `messageId` and dispatches the email for that ticket alone, bypassing the UI. Ideal for an AI agent handling an individual ticket extraction workflow in the background.
+This initializes a visual, interactive bash checklist prompt.
+- **Scroll** utilizing Up/Down arrow keys.
+- Toggle evaluated resolved ticket confirmations via mapping **Space**.
+- Press **Enter** to formally batch-process target lists and dispatch the automated email instructions.
+
+**👉 Method 2: Batch Execution Bypass (For Non-Interactive Operations/AI Scripts)**
+```bash
+pnpm watcher manual-processing --all
+```
+Instantly streams across every paused JSON ticket inside the `classified/` folder and fires their designated HTML mailing templates sequentially. The script entirely bypasses terminal visual outputs.
+
+**👉 Method 3: Singular Specific ID Reference Constraints (For AI Scripts)**
+```bash
+pnpm watcher manual-processing <messageId> <messageId2>
+```
+Targets entirely unique `messageIds` allowing direct, headless script processing endpoints. Ideal inside broader operations architectures when an isolated AI agent isolates an identifier and successfully processes the constraint itself.

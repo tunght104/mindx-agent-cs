@@ -2,13 +2,14 @@ import * as fs from "fs";
 import * as path from "path";
 import { fileURLToPath } from "url";
 import { Client } from "@microsoft/microsoft-graph-client";
-import { authProvider } from "../../../mail-auto-cli/src/authentication.js";
-import { replyMail } from "../mail-client.js";
-import { writeCompletedTicket, cleanupClassifiedTicket } from "../ai-classifier.js";
+import { authProvider } from "../../mail-auto-cli/src/authentication.js";
+import { replyMail } from "./mail-client.js";
+import { writeCompletedTicket, cleanupClassifiedTicket } from "./ai-classifier.js";
 import prompts from "prompts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CLASSIFIED_DIR = path.resolve(__dirname, "../../classified");
+const CLASSIFIED_DIR = path.resolve(__dirname, "../classified");
+
 
 export async function runApproveCli(args: string[]) {
   if (!fs.existsSync(CLASSIFIED_DIR)) {
@@ -59,7 +60,7 @@ export async function runApproveCli(args: string[]) {
     const { selected } = await prompts({
       type: "multiselect",
       name: "selected",
-      message: "Chọn các ticket bạn ĐÃ XỬ LÝ xong trên CRM để gửi mail:",
+      message: "Select the tickets you have manually resolved on the CRM to send emails:",
       instructions: false,
       choices: tickets.map((t) => ({
         title: `[${t.type}] ${t.subject.slice(0, 60)}${t.subject.length > 60 ? "..." : ""}`,

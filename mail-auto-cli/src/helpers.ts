@@ -8,10 +8,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export const PAGE_SIZE = 10;
 
-export const ALLOWED_SENDERS = [
-  "techteam@mindxhrm.odoo.com",
-  "thuypt@mindx.com.vn"
-];
+let config: any = {};
+try {
+  config = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../.mail.config.json"), "utf-8"));
+} catch (err) {
+  // Fallback defaults if file is not found
+}
+export const ALLOWED_SENDERS: string[] = config.ALLOWED_SENDERS || [];
 
 // ── Shared Types ─────────────────────────────────────────────────────────────
 

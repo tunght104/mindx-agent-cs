@@ -1,0 +1,6 @@
+{
+  "ALLOWED_SENDERS": [
+    "techteam@mindxhrm.odoo.com",
+    "thuypt@mindx.com.vn"
+  ]
+}
