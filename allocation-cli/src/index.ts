@@ -3,11 +3,16 @@ import {
   readCrmToken,
   getOrder,
   updatePayment,
+  resetPaymentAllocation,
 } from "./lib/allocation.js";
+
+import type { CrmVersion } from "./lib/allocation.js";
 
 type Args = {
   leadId: string;
   dryRun: boolean;
+  crmToken: string;
+  crmVersion: CrmVersion;
 };
 
 function parseArgs(): Args {
@@ -17,19 +22,21 @@ function parseArgs(): Args {
     .version("1.0.0")
     .description("Update ALL payments allocation for a lead")
     .requiredOption("--lead-id <leadId>", "Lead ID to process")
+    .option("--crm-token <crmToken>", "CRM token")
+    .option("--crm-version <crmVersion>", "CRM version", "v2")
     .option("--dry-run", "Dry run — print payload without calling API", false);
 
   program.parse(process.argv);
-  const { leadId, dryRun } = program.opts();
-  return { leadId, dryRun };
+  const { leadId, dryRun, crmToken, crmVersion } = program.opts();
+  return { leadId, dryRun, crmToken, crmVersion };
 }
 
 // ── Entry Point ──────────────────────────────────────────────────────────────
 
 async function main() {
   const args = parseArgs();
-  const crmToken = readCrmToken();
-  const order = await getOrder(args.leadId, crmToken);
+  const crmToken = args.crmToken || readCrmToken();
+  const order = await getOrder(args.leadId, crmToken, args.crmVersion);
   const { payments } = order;
 
   console.log(`Lead: ${args.leadId}`);
@@ -40,6 +47,20 @@ async function main() {
     return;
   }
 
+  console.log(`\n--- Phase 1: Reset all allocations to zero ---`);
+  for (const [i, payment] of payments.entries()) {
+    await resetPaymentAllocation(
+      args.leadId,
+      crmToken,
+      order,
+      payment,
+      (msg) => console.log(msg),
+      args.dryRun,
+      args.crmVersion
+    );
+  }
+
+  console.log(`\n--- Phase 2: Update allocations with amounts ---`);
   const results: string[] = [];
   for (const [i, payment] of payments.entries()) {
     const result = await updatePayment(
@@ -50,7 +71,8 @@ async function main() {
       i,
       payments.length,
       (msg) => console.log(msg),
-      args.dryRun
+      args.dryRun,
+      args.crmVersion
     );
     results.push(result);
   }
