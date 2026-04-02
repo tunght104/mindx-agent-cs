@@ -4,14 +4,14 @@
 import { HandlerContext } from "./types.js";
 import { replyMail } from "../mail-client.js";
 import { logger } from "../logger.js";
-import { getOrder, updatePayment } from "../../../allocation-cli/src/lib/allocation.js";
+import { getOrder, updatePayment, resetPayment } from "../../../allocation-cli/src/lib/allocation.js";
 
 async function runAllocation(
   leadId: string,
   crmToken: string,
   dryRun: boolean
 ): Promise<number> {
-  const order = await getOrder(leadId, crmToken);
+  const order = await getOrder(leadId, crmToken, "v2");
   const { payments } = order;
 
   if (payments.length === 0) {
@@ -21,10 +21,20 @@ async function runAllocation(
 
   for (const [i, payment] of payments.entries()) {
     if (dryRun) {
+      logger.info(`  [DRY RUN] Would reset payment ${payment.id}`);
+      continue;
+    }
+    await resetPayment(leadId, crmToken, order, payment, "v2", (msg) =>
+      logger.info(`  ${msg}`)
+    );
+  }
+
+  for (const [i, payment] of payments.entries()) {
+    if (dryRun) {
       logger.info(`  [DRY RUN] Would update payment ${payment.id}`);
       continue;
     }
-    await updatePayment(leadId, crmToken, order, payment, i, payments.length, (msg) =>
+    await updatePayment(leadId, crmToken, order, payment, i, payments.length, "v2", (msg) =>
       logger.info(`  ${msg}`)
     );
   }

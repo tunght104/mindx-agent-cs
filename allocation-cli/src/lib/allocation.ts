@@ -205,14 +205,14 @@ export function buildAllocationsToZero(
   });
 }
 
-export async function resetPaymentAllocation(
+export async function resetPayment(
   leadId: string,
   crmToken: string,
   order: Order,
   payment: Payment,
+  crmVersion: CrmVersion = "v2",
   onProgress?: (msg: string) => void,
-  isDryRun: boolean = false,
-  crmVersion: CrmVersion = "v2"
+  isDryRun: boolean = false
 ): Promise<void> {
   const paymentAllocationsForZero = buildAllocationsToZero(order.productItemIds);
   const payloadForZero = { leadId, paymentId: payment.id, paymentAllocations: paymentAllocationsForZero };
@@ -254,9 +254,9 @@ export async function updatePayment(
   payment: Payment,
   index: number,
   total: number,
+  crmVersion: CrmVersion = "v2",
   onProgress?: (msg: string) => void,
-  isDryRun: boolean = false,
-  crmVersion: CrmVersion = "v2"
+  isDryRun: boolean = false
 ): Promise<string> {
   const isLastPayment = index === total - 1;
   const paymentAllocations = buildAllocations(payment, order.productItemIds, order.productItemPrices, isLastPayment, order.remaining);

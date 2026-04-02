@@ -3,7 +3,7 @@ import {
   readCrmToken,
   getOrder,
   updatePayment,
-  resetPaymentAllocation,
+  resetPayment,
 } from "./lib/allocation.js";
 
 import type { CrmVersion } from "./lib/allocation.js";
@@ -49,14 +49,14 @@ async function main() {
 
   console.log(`\n--- Phase 1: Reset all allocations to zero ---`);
   for (const [i, payment] of payments.entries()) {
-    await resetPaymentAllocation(
+    await resetPayment(
       args.leadId,
       crmToken,
       order,
       payment,
+      args.crmVersion,
       (msg) => console.log(msg),
-      args.dryRun,
-      args.crmVersion
+      args.dryRun
     );
   }
 
@@ -70,9 +70,9 @@ async function main() {
       payment,
       i,
       payments.length,
+      args.crmVersion,
       (msg) => console.log(msg),
-      args.dryRun,
-      args.crmVersion
+      args.dryRun
     );
     results.push(result);
   }
