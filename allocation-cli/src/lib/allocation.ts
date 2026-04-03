@@ -143,8 +143,6 @@ export function buildAllocations(
   payment: Payment,
   productItemIds: string[],
   productItemPrices: number[],
-  isLastPayment: boolean,
-  remaining: number
 ): PaymentAllocation[] {
   let totalProductItemPrice = 0;
   for (const productPrice of productItemPrices) {
@@ -157,17 +155,10 @@ export function buildAllocations(
     let amount: number;
     const isLastItem = index === productItemIds.length - 1;
 
-    if (payment.status === "CANCELLED" || payment.status === "canceled") {
+    if (payment.status === "CANCELLED" || payment.status === "canceled" || payment.status === "Denied") {
       amount = 0;
     } else if (productItemIds.length === 1) {
       amount = payment.amount;
-    } else if (isLastPayment) {
-      /*
-      For leads with multiple payments and multiple product items.
-      We distribute evenly except the last one — for which we allocate maximum
-      and let the system enforce the per-item cap automatically.
-      */
-      amount = remaining <= 0 ? payment.amount : 0;
     } else {
       if (isLastItem) {
         // Push all remaining amount to the last item
@@ -259,7 +250,7 @@ export async function updatePayment(
   isDryRun: boolean = false
 ): Promise<string> {
   const isLastPayment = index === total - 1;
-  const paymentAllocations = buildAllocations(payment, order.productItemIds, order.productItemPrices, isLastPayment, order.remaining);
+  const paymentAllocations = buildAllocations(payment, order.productItemIds, order.productItemPrices);
 
   const payload = { leadId, paymentId: payment.id, paymentAllocations };
 
