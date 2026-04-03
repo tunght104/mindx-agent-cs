@@ -1,0 +1,15 @@
+{
+  "allocation.html": "Use this template to send confirmation after successful allocation.",
+  "no-problem.html": "General response template when checking the system and notifying the student that there are no issues.",
+  "initialization.html": "Initialization notification email template.",
+  "drop-out.html": "Used when users report being unable to create a drop-out ticket.",
+  "make-order-failed": "Response when users report being unable to create an order (make order failed) or cannot find customer information.",
+  "no-payment-date": "Response when users report being unable to select a payment date when adding payment, or issues related to payment date and order creation date.",
+  "not-active.html": "Send notification when the system detects the course is currently not active.",
+  "not-resale-upsale": "Response when users report being UNABLE to create or perform resale/upsale operations. Note: if it does not mention being UNABLE to perform resale or upsale, it is not related.",
+  "pay-not-full.html": "Used after allocating funds and receiving remaining > 0 - when the customer has paid but not 100% of the tuition fee (partial payment). Reminder to pay the remaining balance.",
+  "refund-reward-point.html": "Notification related to refunding reward points/student points.",
+  "request-re-running.html": "Used when users request re-running - requesting to reopen a class (for finished classes).",
+  "sync-v2-to-v1.html": "Notification that customer account data is being synced and updated between the CRM V2 system and the legacy V1 version.",
+  "tick-uncompleted.html": "Sent to students when the student status is related to tick uncompleted."
+}

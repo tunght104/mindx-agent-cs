@@ -7,16 +7,16 @@ Welcome to the MindX CRM Agent Workspace. Your primary duty is to help the user 
 When the user gives a prompt, classify their intent and read the appropriate workflow file before executing:
 
 1. **If the user says:** "Xử lý ticket", "process ticket", "manual processing"
-   --> **Read:** `.gemini/workflows/ticket-processing.md`
+   --> **Read:** `.codex/skills/ticket-processing.md`
 2. **If the user says:** "rep mail <keyword>", "reply to this mail"
-   --> **Read:** `.gemini/workflows/keyword-reply.md`
+   --> **Read:** `.codex/skills/keyword-reply.md`
 3. **ALWAYS keep in mind:** Error handling and missing parameters
-   --> **Read:** `.gemini/workflows/error-handling.md` if any CLI command fails.
+   --> **Read:** `.codex/skills/error-handling.md` if any CLI command fails.
 
 ## CRITICAL: Task Execution Flow
 
 - **Do NOT stop mid-task:** Once you start a workflow, you must see it through. 
-- If you need missing parameters or clarifications, you must still keep the task active: read `.gemini/workflows/error-handling.md` and dynamically **ask the user** for the required input. 
+- If you need missing parameters or clarifications, you must still keep the task active: read `.codex/skills/error-handling.md` and dynamically **ask the user** for the required input. 
 - **Only STOP the task completely** when:
   1. The entire workflow has successfully finished.
   2. A hard error occurs (e.g., API failure, `allocation` failure) that cannot be bypassed.
@@ -25,7 +25,7 @@ When the user gives a prompt, classify their intent and read the appropriate wor
 
 ## Technical Reference: Command Usage
 
-For ALL MindX CRM operations, you MUST run the pnpm commands below from the workspace root (`/home/tkstung104/Code/mindx-tools`).
+For ALL MindX CRM operations, you MUST run the pnpm commands below from the workspace root (`/home/tkstung104/Code/agent-cs/mail-auto-cli`).
 
 | Operation | pnpm command |
 |-----------|-------------|

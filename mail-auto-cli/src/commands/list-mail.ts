@@ -5,7 +5,7 @@ import { fetchMails, type MailMessage } from "../helpers.js";
 export const register = (program: Command, client: Client) => {
   program
     .command("list-mail")
-    .description("List 10 latest emails, -p for page, -s for search keyword")
+    .description("List 10 latest emails, -p for page, -s for search keyword. Just use 1 of 2 options, dont use both.")
     .option("-p, --page <page>", "Page number", (value) => parseInt(value), 1)
     .option("-s, --search <keyword>", "Search keyword")
     .action(async (options) => {
