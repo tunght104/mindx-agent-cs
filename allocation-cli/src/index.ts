@@ -6,6 +6,10 @@ import {
   resetPayment,
 } from "./lib/allocation.js";
 
+import {
+  savePrice
+} from "./lib/savePrice.js";
+
 import type { CrmVersion } from "./lib/allocation.js";
 
 type Args = {
@@ -36,6 +40,8 @@ function parseArgs(): Args {
 async function main() {
   const args = parseArgs();
   const crmToken = args.crmToken || readCrmToken();
+  // await savePrice(args.leadId, crmToken, args.crmVersion);
+
   const order = await getOrder(args.leadId, crmToken, args.crmVersion);
   const { payments } = order;
 

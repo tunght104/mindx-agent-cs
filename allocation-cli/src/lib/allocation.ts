@@ -3,12 +3,9 @@
 // No CLI dependencies — safe to import from other packages.
 
 import axios from "axios";
-import path from "path";
-import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, "../../../.env") });
+dotenv.config();
 
 const CRM_TOKEN = process.env.CRM_TOKEN || "";
 const GRAPHQL_ENDPOINT_V2 = "https://gate-way.mindx.edu.vn/crm-api/graphql";
@@ -155,7 +152,7 @@ export function buildAllocations(
     let amount: number;
     const isLastItem = index === productItemIds.length - 1;
 
-    if (payment.status === "CANCELLED" || payment.status === "canceled" || payment.status === "Denied") {
+    if (payment.status === "CANCELLED" || payment.status === "canceled" || payment.status === "denied" || payment.status === "DENIED") {
       amount = 0;
     } else if (productItemIds.length === 1) {
       amount = payment.amount;
@@ -254,7 +251,7 @@ export async function updatePayment(
 
   const payload = { leadId, paymentId: payment.id, paymentAllocations };
 
-  const statusLabel = payment.status === "CANCELLED" || payment.status === "canceled" ? ` [CANCELLED → amount=0]` : "";
+  const statusLabel = payment.status === "CANCELLED" || payment.status === "canceled" || payment.status === "denied" || payment.status === "DENIED" ? ` [CANCELLED OR DENIED → amount=0]` : "";
   onProgress?.(`[Payment ${index + 1}/${total}] id=${payment.id}, amount=${payment.amount}, isLastPayment=${isLastPayment}${statusLabel} (API: ${crmVersion})`);
 
   if (isDryRun) {
